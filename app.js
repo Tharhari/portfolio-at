@@ -88,7 +88,7 @@ db.run("CREATE TABLE projectsSkills (projectSkillID INTEGER PRIMARY KEY, project
   else {
     console.log("---> Table projectsSkills created!")
 
-    const projectsSkills=[
+    const projectsSkills = [
       {"id":"1", "projectID":"1", "skillID":"1"},
       {"id":"2", "projectID":"1", "skillID":"5"},
       {"id":"3", "projectID":"1", "skillID":"6"},
@@ -101,7 +101,7 @@ db.run("CREATE TABLE projectsSkills (projectSkillID INTEGER PRIMARY KEY, project
     ]
     
     projectsSkills.forEach( (oneProjectSkill) => {
-      db.run("INSERT INTO projectsSkills (projectSkillID, projectID, skillID) VALUES (?, ?, ?)", [oneProjectSkill.id, oneProjectSkill.pid, oneProjectSkill.sid], (error) => {
+      db.run("INSERT INTO projectsSkills (projectSkillID, projectID, skillID) VALUES (?, ?, ?)", [oneProjectSkill.id, oneProjectSkill.projectID, oneProjectSkill.skillID], (error) => {
         if (error) {
           console.log("ERROR: ", error)
         } 
@@ -177,19 +177,34 @@ app.get('/projects', function(request,response){
 })
 
 app.get('/projects/:id', function(request, response){
-  // get the id from the dynamic route
-  const id = request.params.id;
 
-  const projects_model = projects.find(h => h.id === id);
+  const projectId = request.params.id;
+  // Fetch project details
+  db.get("SELECT projectID, projectName, projectYear, projectDescription FROM projects WHERE projectID = ?", [projectId], (error, project) => {
+      if (error) {
+          throw error;
+      }
 
+      if (project) {
+          // Fetch skills associated with the project
+          db.all(`
+                SELECT skills.skillID, skills.skillName, skills.skillType, skills.skillDescription
+                FROM skills
+                JOIN projectSkills ON skills.skillID = projectSkills.skillID
+                WHERE projectSkills.projectID = ?
+                `, [projectId], (error, skills) => {
+                  console.log(skills);
+              if (error) {
+                  throw error;
+              }
 
-  if (projects_model) {
-      
-      response.render('project.handlebars', projects_model);
-  } else {
-      
-      response.status(404).render('404.handlebars');
-  }
+              response.render('project.handlebars', { project: project, skills: skills });
+          });
+      } else {
+          response.status(404).send('Project not found');
+      }
+  });
+
 });
 
 // defines the final default route 404 NOT FOUND

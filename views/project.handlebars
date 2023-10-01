@@ -2,8 +2,18 @@
     <div>
         <h1>Project Information</h1>
         <div>
-            
-            {{project}} has ID {{id}}.
+            <h3>{{project.projectName}}</h3>
+            <p><strong>Year:</strong> {{project.projectYear}}</p>
+            <p>Description: {{project.projectDescription}} </p>
+
+            <h4>Skills Required:</h4>
+            <ul>
+                {{#each skills}}
+                <li> 
+                    {{skillName}} 
+                </li>
+                {{/each}}
+            </ul>
         </div>
     </div>
 </div>
