@@ -190,8 +190,8 @@ app.get('/projects/:id', function(request, response){
           db.all(`
                 SELECT skills.skillID, skills.skillName, skills.skillType, skills.skillDescription
                 FROM skills
-                JOIN projectSkills ON skills.skillID = projectSkills.skillID
-                WHERE projectSkills.projectID = ?
+                JOIN projectsSkills ON skills.skillID = projectsSkills.skillID
+                WHERE projectsSkills.projectID = ?
                 `, [projectId], (error, skills) => {
                   console.log(skills);
               if (error) {
