@@ -18,10 +18,6 @@ app.use(express.static('public'))
 const humans = [
     {"id": "0", "name": "Arvin"},  
 ]
-const projects = [
-  {"id": "0", "project": "Portfolio website"},
-  {"id": "1", "project": "Java chess program"},
-]
 
 const db = new sqlite3.Database('projects-at.db')
 
@@ -155,9 +151,28 @@ app.get('/contact', function(request,response){
 })
 
 app.get('/projects', function(request,response){
-  const projects_model = { listProjects: projects}
-
-  response.render('projects.handlebars', projects_model);
+  //const projects_model = { listProjects: projects}
+  //response.render('projects.handlebars', projects_model);
+  db.all("SELECT * FROM projects", function (error, theProjects) {
+    if (error) {
+        const model = {
+            databaseError: true,
+            theError: error,
+            projects: []
+        }
+        // renders the page with the model
+        response.render("projects.handlebars", model)
+    }
+    else {
+        const model = {
+            databaseError: false,
+            theError: "",
+            projects: theProjects
+        }
+        // renders the page with the model
+        response.render("projects.handlebars", model)
+    }
+  })
    
 })
 

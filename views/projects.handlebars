@@ -2,11 +2,17 @@
     <div>
         <h1>My Projects</h1>
         <div>
+        {{#if databaseError}}
+        <div>
+            An error has occurred with the database: <br/>
+            {{theError}}
+        </div>
+        {{else}}
         <ul class="project_container">
-        {{#each listProjects}}
-            <li class="project_item"><a href="/projects/{{id}}"> {{project}} </a></li>
+        {{#each projects}}
+            <li class="project_item"><a href="/projects/{{projectID}}"> {{projectName}} </a></li>
         {{/each}}
-        
+        {{/if}}
         </ul>
         </div>
     </div>
