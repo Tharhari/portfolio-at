@@ -2,6 +2,11 @@
     <div>
         <h1>My Projects</h1>
             <div>
+            {{#if isAdmin}}
+                <div>
+                    <a href="projects/new" class="btn btn-link"> New project</a>
+                </div>
+            {{/if}}
             {{#if databaseError}}
                 <div>
                     An error has occurred with the database: <br/>
@@ -10,7 +15,11 @@
             {{else}}
             <ul class="project_container">
                 {{#each projects}}
-                    <li class="project_item"><a href="/projects/{{projectID}}"> {{projectName}} </a></li>
+                    <li class="project_item"><a href="/projects/{{projectID}}"> {{projectName}}</a>
+                    {{#if ../isAdmin}}
+                    <a href="projects/update/{{projectID}}"> Modify </a> - <a href="projects/delete/{{projectID}}" class="important"> Delete</a>
+                    {{/if}}
+                    </li>
                 {{/each}}
             {{/if}}
             </ul>

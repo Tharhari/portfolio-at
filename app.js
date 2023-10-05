@@ -263,6 +263,113 @@ app.get('/logout', (request, respone) => {
   respone.redirect('/')
 })
 
+app.get('/projects/delete/:id', (request, response) => {
+  const id = request.params.id
+  if (request.session.isLoggedIn && request.session.isAdmin) {
+    db.run("DELETE FROM projects WHERE projectID=?", [id], function (error, theProjects) {
+      if (error) {
+          const model = { databaseError: true, theError: error,
+            isLoggedIn: request.session.isLoggedIn,
+            name: request.session.name,
+            isAdmin: request.session.isAdmin
+          }
+          console.log("error at deletion")
+          response.render("home.handlebars", model)
+        }
+      else {
+        const model = { databaseError: false, theError: "",
+          isLoggedIn: request.session.isLoggedIn,
+          name: request.session.name,
+          isAdmin: request.session.isAdmin
+        }
+        console.log("deleted")
+        response.render("home.handlebars", model)
+      } 
+    })
+  }
+  else {
+    response.redirect('/login')
+  }
+})
+
+app.get('/projects/new', (request, response) => {
+  if (request.session.isLoggedIn && request.session.isAdmin){
+    const model = {
+      isLoggedIn: request.session.isLoggedIn,
+      name: request.session.name,
+      isAdmin: request.session.isAdmin
+    }
+    response.render('newproject.handlebars', model)
+  }
+  else {
+    response.redirect('/login')
+  }
+})
+
+app.post('/projects/new', (request, response) => {
+  const newProj = [request.body.projName, request.body.projYear, request.body.projectDescription]
+  if(request.session.isLoggedIn && request.session.isAdmin) {
+    db.run("INSERT INTO projects (projectName, projectYear, projectDescription) VALUES (?, ?, ?)", newProj, (error) =>{
+      if(error) {
+        console.log("Error: ", error)
+      }
+      else {
+        console.log("Line added into the projects table")
+      }
+      response.redirect('/projects')
+    })
+  }
+  else {
+    response.redirect('/login')
+  }
+})
+
+app.get('/projects/update/:id', (request, response) => {
+  const id = request.params.id
+  db.get("SELECT * FROM projects WHERE projectID=?", [id], function(error, theProject) {
+    if (error) {
+      console.log("Error: ", error)
+      const model = {databaseError: true, theError: error,
+      project: {},
+      isLoggedIn: request.session.isLoggedIn,
+      name: request.session.name,
+      isAdmin: request.session.isAdmin,
+    }
+    response.render("modifyproject.handlebars", model)
+    }
+    else {
+      const model = {databaseError: false, theError: "",
+      project: theProject,
+      isLoggedIn: request.session.isLoggedIn,
+      name: request.session.name,
+      isAdmin: request.session.isAdmin
+
+    }
+    response.render("modifyproject.handlebars", model)
+    }
+  })
+})
+
+app.post('/projects/update/:id', (request, reponse) =>{
+  const id = request.params.id
+  const newp = [request.body.projName, request.body.projYear, request.body.projectDescription, id]
+  if (request.session.isLoggedIn && request.session.isAdmin) {
+    db.run("UPDATE project SET projectName=?, projectYear=?, projectDescription=?", newp, (error) => {
+      if (error) {
+        console.log("Error: ", error)
+      }
+      else {
+        console.log("Line added into the projects table")
+      }
+      reponse.redirect('/projects')
+      
+    })
+  }
+  else {
+      response.redirect('/login')
+    }
+})
+
 // defines the final default route 404 NOT FOUND
 app.use(function(req,res){
   res.status(404).render('404.handlebars');

@@ -1,0 +1,32 @@
+<div id="main">
+    <div>
+        <h3>New project</h3>
+        <div>
+            {{#if isLoggedIn}}
+                {{#if isAdmin}}
+                <form action="/projects/new" method="post">
+                    <fieldset>
+                        <label for="projName">Project name:</label>
+                        <input type="text" name="projName" id="projName" required="required">
+                        <br/>
+                        <label for="projYame">Project Year:</label>
+                        <input type="number" name="projYear" id="projYear" required="required">
+                        <br/>
+                        <label for="projDescription">Project Description:</label>
+                        <textarea name="projDescription" id="projDescription" cols="30" rows="10" required="required"></textarea>
+                        <br/>
+                    </fieldset>
+                    <input type="submit" value="Add project">
+                </form>
+                {{else}}
+                <p>You need to be an administrator to add a new project!</p>
+                {{/if}}
+            {{else}}
+            <p>
+                You must be looged in to add a new project <br/>
+                Go to the <a href="/login"> login</a> page.
+            </p>
+            {{/if}}
+        </div>
+    </div>
+</div>
