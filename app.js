@@ -255,6 +255,14 @@ app.post('/login', (request, response) => {
   }
 })
 
+app.get('/logout', (request, respone) => {
+  request.session.destroy((error) => {
+  console.log("Error while destroing information",error)
+  })
+  console.log("Logging out")
+  respone.redirect('/')
+})
+
 // defines the final default route 404 NOT FOUND
 app.use(function(req,res){
   res.status(404).render('404.handlebars');
