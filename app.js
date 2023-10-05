@@ -1,9 +1,13 @@
 const express = require('express') // loads the express package
 const { engine } = require('express-handlebars'); // loads handlebars for Express
+const sqlite3 = require('sqlite3') 
+const bodyParser = require('body-parser')
+const session = require('express-session')
+const connectSqlite3 = require('connect-sqlite3')
+const cookieParser = require('cookie-parser')
+
 const port = 8080 // defines the port
 const app = express() // creates the Express application
-const sqlite3 = require('sqlite3') 
-
 // defines handlebars engine
 app.engine('handlebars', engine());
 // defines the view engine to be handlebars
@@ -14,12 +18,20 @@ app.set('views', './views');
 // define static directory "public" to access css/ and img/
 app.use(express.static('public'))
 
-// MODEL (DATA)
-const humans = [
-    {"id": "0", "name": "Arvin"},  
-]
+
+app.use(bodyParser.urlencoded({ extended: false}))
+app.use(bodyParser.json())
+
+const SQLiteStore = connectSqlite3(session)
 
 const db = new sqlite3.Database('projects-at.db')
+
+app.use(session({
+  store: new SQLiteStore({db: "session-db.db"}),
+  "saveUninitialized" : false,
+  "resave": false,
+  "secret":"Thisisasecretsentenceiguess?"
+}));
 
 db.run("CREATE TABLE projects (projectID INTEGER PRIMARY KEY, projectName TEXT NOT NULL, projectYear INTEGER NOT NULL, projectDescription TEXT NOT NULL)", (error) =>{
   if (error){
@@ -118,36 +130,54 @@ db.run("CREATE TABLE projectsSkills (projectSkillID INTEGER PRIMARY KEY, project
 // CONTROLLER (THE BOSS)
 // defines route "/"
 app.get('/', function(request, response){
-  response.render('home.handlebars')
+  console.log("SESSION: ", request.session)
+  const model = {
+    isAdmin: request.session.isAdmin,
+    isLoggedIn: request.session.isLoggedIn ,
+    name: request.session.name
+  }
+  response.render('home.handlebars', model)
 })
 
 
 app.get('/cv', function(request, response){
+  console.log("SESSION: ", request.session)
+  const model = {
+    isAdmin: request.session.isAdmin,
+    isLoggedIn: request.session.isLoggedIn ,
+    name: request.session.name
+  }
   
-  response.render('cv.handlebars')
+  response.render('cv.handlebars', model)
 })
 
 
 app.get('/contact', function(request,response){
+  console.log("SESSION: ", request.session)
+  const model = {
+    isAdmin: request.session.isAdmin,
+    isLoggedIn: request.session.isLoggedIn ,
+    name: request.session.name
+  }
 
-  const id = request.params.id; // Convert the id string to a number
-
-  // Find the human with the given id
-  const human = humans.find(h => h.id === id);
   
-  response.render('contact.handlebars', human);
+  response.render('contact.handlebars', model);
  
 })
 
 app.get('/projects', function(request,response){
   //const projects_model = { listProjects: projects}
   //response.render('projects.handlebars', projects_model);
+  console.log("SESSION: ", request.session)
   db.all("SELECT * FROM projects", function (error, theProjects) {
     if (error) {
         const model = {
             databaseError: true,
             theError: error,
-            projects: []
+            projects: [],
+            isAdmin: request.session.isAdmin,
+            isLoggedIn: request.session.isLoggedIn ,
+            name: request.session.name
         }
         // renders the page with the model
         response.render("projects.handlebars", model)
@@ -156,7 +186,11 @@ app.get('/projects', function(request,response){
         const model = {
             databaseError: false,
             theError: "",
-            projects: theProjects
+            projects: theProjects,
+            isAdmin: request.session.isAdmin,
+            isLoggedIn: request.session.isLoggedIn ,
+            name: request.session.name
+            
         }
         // renders the page with the model
         response.render("projects.handlebars", model)
@@ -195,6 +229,31 @@ app.get('/projects/:id', function(request, response){
   });
 
 });
+
+app.get('/login', (request, response) => {
+  const model = {}
+  response.render('login.handlebars', model);
+})
+
+app.post('/login', (request, response) => {
+  const un = request.body.un
+  const pw = request.body.pw
+
+  if (un=="Arvin" && pw=="1234"){
+    console.log("Admin is logged in")
+    request.session.isAdmin = true
+    request.session.isLoggedIn = true
+    request.session.name = "Arvin"
+    response.redirect('/')
+  }
+  else {
+    console.log("Wrong username or password")
+    request.session.isAdmin = false
+    request.session.isLoggedIn = false
+    request.session.name = ""
+    response.redirect('/login')
+  }
+})
 
 // defines the final default route 404 NOT FOUND
 app.use(function(req,res){
