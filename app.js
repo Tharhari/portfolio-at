@@ -121,17 +121,6 @@ app.get('/', function(request, response){
   response.render('home.handlebars')
 })
 
-// defines route "/humans"
-app.get('/about', function(request, response){
-  //const model = { listHumans: humans } // defines the model
-  // in the next line, you should send the abovedefined 
-  // model to the page and not an empty object {}...
-  //response.render('about.handlebars', model)
-
-
-
-  response.render('about.handlebars')
-})
 
 app.get('/cv', function(request, response){
   
