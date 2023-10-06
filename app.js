@@ -130,7 +130,7 @@ db.run("CREATE TABLE projectsSkills (projectSkillID INTEGER PRIMARY KEY, project
 // CONTROLLER (THE BOSS)
 // defines route "/"
 app.get('/', function(request, response){
-  console.log("SESSION: ", request.session)
+  //console.log("SESSION: ", request.session)
   const model = {
     isAdmin: request.session.isAdmin,
     isLoggedIn: request.session.isLoggedIn ,
@@ -141,7 +141,7 @@ app.get('/', function(request, response){
 
 
 app.get('/cv', function(request, response){
-  console.log("SESSION: ", request.session)
+  //console.log("SESSION: ", request.session)
   const model = {
     isAdmin: request.session.isAdmin,
     isLoggedIn: request.session.isLoggedIn ,
@@ -153,7 +153,7 @@ app.get('/cv', function(request, response){
 
 
 app.get('/contact', function(request,response){
-  console.log("SESSION: ", request.session)
+  //console.log("SESSION: ", request.session)
   const model = {
     isAdmin: request.session.isAdmin,
     isLoggedIn: request.session.isLoggedIn ,
@@ -168,7 +168,7 @@ app.get('/contact', function(request,response){
 app.get('/projects', function(request,response){
   //const projects_model = { listProjects: projects}
   //response.render('projects.handlebars', projects_model);
-  console.log("SESSION: ", request.session)
+  //console.log("SESSION: ", request.session)
   db.all("SELECT * FROM projects", function (error, theProjects) {
     if (error) {
         const model = {
@@ -203,27 +203,29 @@ app.get('/projects/:id', function(request, response){
 
   const projectId = request.params.id;
   // Fetch project details
-  db.get("SELECT projectID, projectName, projectYear, projectDescription FROM projects WHERE projectID = ?", [projectId], (error, project) => {
-      if (error) {
-          throw error;
+
+  db.get("SELECT projectID, projectName, projectYear, projectDescription FROM projects WHERE projectID = ?", 
+  [projectId], (error, project) => {
+      //console.log(projectId)
+    if (error) {
+        console.log("Error: ", error)
       }
 
-      if (project) {
+      else if (project) {
           // Fetch skills associated with the project
-          db.all(`
-                SELECT skills.skillID, skills.skillName, skills.skillType, skills.skillDescription
-                FROM skills
-                JOIN projectsSkills ON skills.skillID = projectsSkills.skillID
-                WHERE projectsSkills.projectID = ?
-                `, [projectId], (error, skills) => {
-                  console.log(skills);
+          db.all(`SELECT skills.skillID, skills.skillName, skills.skillType, skills.skillDescription
+                FROM skills JOIN projectsSkills ON skills.skillID = projectsSkills.skillID
+                WHERE projectsSkills.projectID = ?`,
+                 [projectId], (error, skills) => {
+                  //console.log(skills);
               if (error) {
-                  throw error;
+                console.log("Error: ", error)
               }
 
               response.render('project.handlebars', { project: project, skills: skills });
           });
-      } else {
+      } 
+      else {
           response.status(404).send('Project not found');
       }
   });
@@ -292,8 +294,8 @@ app.get('/projects/delete/:id', (request, response) => {
   }
 })
 
-app.get('/projects/new', (request, response) => {
-  if (request.session.isLoggedIn && request.session.isAdmin){
+app.get('/project/new', (request, response) => {
+  if (request.session.isLoggedIn && request.session.isAdmin) {
     const model = {
       isLoggedIn: request.session.isLoggedIn,
       name: request.session.name,
@@ -306,10 +308,12 @@ app.get('/projects/new', (request, response) => {
   }
 })
 
-app.post('/projects/new', (request, response) => {
-  const newProj = [request.body.projName, request.body.projYear, request.body.projectDescription]
+app.post('/project/new', (request, response) => {
+
+  const newProj = [request.body.projName, request.body.projYear, request.body.projDescription]
+  
   if(request.session.isLoggedIn && request.session.isAdmin) {
-    db.run("INSERT INTO projects (projectName, projectYear, projectDescription) VALUES (?, ?, ?)", newProj, (error) =>{
+    db.run("INSERT INTO projects (projectName, projectYear, projectDescription) VALUES (?, ?, ?)", newProj, (error) => {
       if(error) {
         console.log("Error: ", error)
       }
@@ -352,9 +356,10 @@ app.get('/projects/update/:id', (request, response) => {
 
 app.post('/projects/update/:id', (request, reponse) =>{
   const id = request.params.id
-  const newp = [request.body.projName, request.body.projYear, request.body.projectDescription, id]
+  console.log("request body: "+JSON.stringify(request.body))
+  const newp = [request.body.projName, request.body.projYear, request.body.projDescription, id]
   if (request.session.isLoggedIn && request.session.isAdmin) {
-    db.run("UPDATE project SET projectName=?, projectYear=?, projectDescription=?", newp, (error) => {
+    db.run("UPDATE projects SET projectName=?, projectYear=?, projectDescription=?  WHERE projectID=?", newp, (error) => {
       if (error) {
         console.log("Error: ", error)
       }
