@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const connectSqlite3 = require('connect-sqlite3')
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt')
 
 const port = 8080 // defines the port
 const app = express() // creates the Express application
@@ -130,7 +131,39 @@ db.run("CREATE TABLE projectsSkills (projectSkillID INTEGER PRIMARY KEY, project
 // CONTROLLER (THE BOSS)
 // defines route "/"
 app.get('/', function(request, response){
-  //console.log("SESSION: ", request.session)
+  console.log("SESSION: ", request.session)
+
+  /*
+  saltRounds = 12
+  bcrypt.hash("web1234", saltRounds, function(error, hash) {
+    if(error) {
+      console.log("error encrypting the password: ", error)
+    }
+    else {
+      console.log("Hashed password (GENERATE ONLY ONE): ", hash)
+    }
+  }) */
+
+  /*
+  bcrypt.compare(pw, "$2b$12$5jKkgjw7RuLuqzdHaXVRLORQryo67Tziltoy2KQoE4I8XWvuQm8h2", function(error, result) {
+    if (error) {
+      console.log("Error in comparing encryption: ", error)
+    }
+    else if (result == true) {
+      console.log("User is logged in")
+      request.session.isAdmin = (user.uadmin == 1)
+      request.session.isLoggedIn = true
+      request.session.name = user.uname
+      response.redirect("/")
+    }
+    else {
+      console.log('User is NOT logged in')
+      response.redirect("/")
+    }
+  
+  })
+  */
+
   const model = {
     isAdmin: request.session.isAdmin,
     isLoggedIn: request.session.isLoggedIn ,
@@ -241,7 +274,7 @@ app.post('/login', (request, response) => {
   const un = request.body.un
   const pw = request.body.pw
 
-  if (un=="Arvin" && pw=="1234"){
+  if (un=="Arvin" && pw=="web1234"){
     console.log("Admin is logged in")
     request.session.isAdmin = true
     request.session.isLoggedIn = true
