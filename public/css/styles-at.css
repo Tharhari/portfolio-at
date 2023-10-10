@@ -59,13 +59,16 @@
       border-top: 1px solid rgba(255, 255, 255,0.3); 
       border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
     }
-    .navigation li:last-of-type a {
-      border-bottom: none;
-    }
+
   }
   
   .nav_item_right{
     margin-left: auto;
+  }
+
+  .navigation #name_of_admin {
+    color: white;
+    padding-top: 15px;
   }
 
   #button_login{

@@ -1,17 +1,21 @@
 <header id="menu"> 
     <nav>
-        <ul class="navigation">
-            <li><a href="/"> Home </a></li>
-            <li><a href="/cv"> CV </a></li>
-            <li><a href="/projects"> Projects </a></li>
-            <li><a href="/contact"> Contact </a></li>
+        <div class="navigation">
+            <a href="/"> Home </a>
+            <a href="/cv"> CV </a>
+            <a href="/projects"> Projects </a>
+            <a href="/contact"> Contact </a>
             {{#if isLoggedIn}}
-                <li class="nav_item_right">Hi {{name}}</li>
-                <li class="nav_item_right" ><a href="/logout">Logout </a></li>
+                    <div class="nav_item_right" id="name_of_admin">
+                        Hi {{name}}  
+                    </div>
+                    <div class="nav-item-right">
+                        <a href="/logout"> Logout </a>
+                    </div>
             {{else}}
-                <li class="nav_item_right" ><a href="/login">Login </a></li>
+                <a href="/login">Login </a>
             {{/if}}
             
-        </ul>
+        </div>
     </nav>
 </header>
