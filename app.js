@@ -144,25 +144,8 @@ app.get('/', function(request, response){
     }
   }) */
 
-  /*
-  bcrypt.compare(pw, "$2b$12$5jKkgjw7RuLuqzdHaXVRLORQryo67Tziltoy2KQoE4I8XWvuQm8h2", function(error, result) {
-    if (error) {
-      console.log("Error in comparing encryption: ", error)
-    }
-    else if (result == true) {
-      console.log("User is logged in")
-      request.session.isAdmin = (user.uadmin == 1)
-      request.session.isLoggedIn = true
-      request.session.name = user.uname
-      response.redirect("/")
-    }
-    else {
-      console.log('User is NOT logged in')
-      response.redirect("/")
-    }
   
-  })
-  */
+  
 
   const model = {
     isAdmin: request.session.isAdmin,
@@ -270,10 +253,36 @@ app.get('/login', (request, response) => {
   response.render('login.handlebars', model);
 })
 
+
 app.post('/login', (request, response) => {
   const un = request.body.un
   const pw = request.body.pw
 
+  bcrypt.compare(pw, "$2b$12$5jKkgjw7RuLuqzdHaXVRLORQryo67Tziltoy2KQoE4I8XWvuQm8h2", function(error, result) {
+    if (error) {
+      console.log("Error in comparing encryption: ", error)
+    }
+    else if (result == true && un =="Arvin") {
+      console.log("Admin is logged in")
+      request.session.isAdmin = true
+      request.session.isLoggedIn = true
+      request.session.name = "Arvin"
+      response.redirect('/')
+    }
+    else {
+      console.log("Wrong username or password")
+      request.session.isAdmin = false
+      request.session.isLoggedIn = false
+      request.session.name = ""
+      response.redirect('/login')
+    }
+  
+  })
+
+
+
+
+  /*
   if (un=="Arvin" && pw=="web1234"){
     console.log("Admin is logged in")
     request.session.isAdmin = true
@@ -288,7 +297,8 @@ app.post('/login', (request, response) => {
     request.session.name = ""
     response.redirect('/login')
   }
-})
+  */
+}) 
 
 app.get('/logout', (request, respone) => {
   request.session.destroy((error) => {
