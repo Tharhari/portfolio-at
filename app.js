@@ -182,8 +182,6 @@ app.get('/contact', function(request,response){
 })
 
 app.get('/projects', function(request,response){
-  //const projects_model = { listProjects: projects}
-  //response.render('projects.handlebars', projects_model);
   //console.log("SESSION: ", request.session)
   db.all("SELECT * FROM projects", function (error, theProjects) {
     if (error) {
@@ -192,7 +190,7 @@ app.get('/projects', function(request,response){
             theError: error,
             projects: [],
             isAdmin: request.session.isAdmin,
-            isLoggedIn: request.session.isLoggedIn ,
+            isLoggedIn: request.session.isLoggedIn,
             name: request.session.name
         }
         // renders the page with the model
@@ -224,7 +222,7 @@ app.get('/projects/:id', function(request, response){
   [projectId], (error, project) => {
       //console.log(projectId)
     if (error) {
-        console.log("Error: ", error)
+        console.log("Error: ", error) 
       }
 
       else if (project) {
@@ -236,9 +234,27 @@ app.get('/projects/:id', function(request, response){
                   //console.log(skills);
               if (error) {
                 console.log("Error: ", error)
+                const model = {
+                  databaseError: true,
+                  theError: error,
+                  projects: [],
+                  isAdmin: request.session.isAdmin,
+                  isLoggedIn: request.session.isLoggedIn,
+                  name: request.session.name
+                }
+                response.render("projects.handlebars", model)
               }
-
-              response.render('project.handlebars', { project: project, skills: skills });
+              else {
+                const model = {
+                  project: project,
+                  skills: skills,
+                  isAdmin: request.session.isAdmin,
+                  isLoggedIn: request.session.isLoggedIn ,
+                  name: request.session.name
+                }
+                response.render('project.handlebars', model);
+              }
+              
           });
       } 
       else {
@@ -352,9 +368,7 @@ app.get('/project/new', (request, response) => {
 })
 
 app.post('/project/new', (request, response) => {
-
   const newProj = [request.body.projName, request.body.projYear, request.body.projDescription]
-  
   if(request.session.isLoggedIn && request.session.isAdmin) {
     db.run("INSERT INTO projects (projectName, projectYear, projectDescription) VALUES (?, ?, ?)", newProj, (error) => {
       if(error) {

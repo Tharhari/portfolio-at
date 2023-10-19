@@ -61,19 +61,21 @@
     }
 
   }
-  
-  .nav_item_right{
+
+  .navigation .nav_item_right{
+    justify-content: flex-end;
+  }
+  .navigation #name_of_admin{
+    margin-left: auto;
+  }
+  .navigation h6 {
+    color: white;
+    padding-top: 18px;
+  }
+  .navigation .nav_item_login {
     margin-left: auto;
   }
 
-  .navigation #name_of_admin {
-    color: white;
-    padding-top: 15px;
-  }
-
-  #button_login{
-    float: right;
-  }
 
   #heading1 {
     display: flex;

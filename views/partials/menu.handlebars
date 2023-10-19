@@ -1,19 +1,23 @@
 <header id="menu"> 
     <nav>
         <div class="navigation">
+            
             <a href="/"> Home </a>
             <a href="/cv"> CV </a>
             <a href="/projects"> Projects </a>
             <a href="/contact"> Contact </a>
-            {{#if isLoggedIn}}
-                    <div class="nav_item_right" id="name_of_admin">
-                        Hi {{name}}  
+            
+            {{#if isLoggedIn}} 
+                    
+                    <div id="name_of_admin" >
+                        <h6>Hi {{name}}</h6>
                     </div>
-                    <div class="nav-item-right">
+                    
+                    <div class="nav_item_right">
                         <a href="/logout">Logout </a>
                     </div>
             {{else}}
-                <div class="nav-item-right">
+                <div class="nav_item_login">
                     <a href="/login">Login </a>
                 </div>
             {{/if}}
